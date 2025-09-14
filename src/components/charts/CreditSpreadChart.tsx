@@ -65,10 +65,10 @@ const CreditSpreadChart: React.FC<CreditSpreadChartProps> = ({
   const [randomSeed, setRandomSeed] = useState<number[]>([]);
 
   const allBonds = useMemo(() => {
-    if (portfolio) {
+    if (portfolio?.positions && Array.isArray(portfolio.positions)) {
       return portfolio.positions.map(p => p.bond);
     }
-    return bonds;
+    return bonds || [];
   }, [portfolio, bonds]);
 
   // Client-side initialization

@@ -54,6 +54,9 @@ const DurationRiskChart: React.FC<DurationRiskChartProps> = ({
 }) => {
   // Process portfolio data for duration analysis
   const durationData = useMemo(() => {
+    if (!portfolio?.positions || !Array.isArray(portfolio.positions)) {
+      return [];
+    }
     const data: DurationData[] = portfolio.positions.map(position => {
       const duration = position.bond.duration;
       const riskLevel =

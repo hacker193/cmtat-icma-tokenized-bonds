@@ -30,6 +30,9 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
 }) => {
   // Process portfolio data for heatmap
   const heatmapData = useMemo(() => {
+    if (!portfolio?.positions || !Array.isArray(portfolio.positions)) {
+      return { sectors: [], ratings: [], data: [] };
+    }
     const sectors = [...new Set(portfolio.positions.map(p => p.bond.sector))];
     const ratings = ['AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-'];
 
