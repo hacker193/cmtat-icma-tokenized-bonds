@@ -387,6 +387,26 @@ export const generatePriceHistory = (bondId: string, days: number = 30): PriceHi
 // Generate dynamic portfolio from enhanced bonds
 export const generateEnhancedPortfolio = (): Portfolio => {
   // Import only the bonds here to avoid circular dependency
+  if (!mockBonds || !Array.isArray(mockBonds) || mockBonds.length === 0) {
+    console.warn('mockBonds not available for portfolio generation, returning empty portfolio');
+    return {
+      id: 'empty-portfolio',
+      positions: [],
+      totalValue: 0,
+      totalReturn: 0,
+      averageDuration: 0,
+      averageYield: 0,
+      totalUnrealizedPnL: 0,
+      performance: {
+        dailyReturn: 0,
+        weeklyReturn: 0,
+        monthlyReturn: 0,
+        ytdReturn: 0,
+      },
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
   const bonds = mockBonds.slice(0, 6); // Use first 6 bonds for diversity
 
   const positions = bonds.map((bond, index) => {
@@ -442,7 +462,15 @@ export const generateEnhancedPortfolio = (): Portfolio => {
   };
 };
 
-export const mockPortfolio: Portfolio = generateEnhancedPortfolio();
+// Cache for generated portfolio to avoid recomputation during SSR
+let cachedPortfolio: Portfolio | null = null;
+
+export function getMockPortfolio(): Portfolio {
+  if (!cachedPortfolio) {
+    cachedPortfolio = generateEnhancedPortfolio();
+  }
+  return cachedPortfolio;
+}
 
 // Generate market depth data with realistic liquidity patterns
 export const generateMarketDepth = (bondId: string): MarketDepth => {
@@ -869,7 +897,7 @@ export const mockData = {
   bonds: mockBonds,
   yieldCurve: generateYieldCurveData(),
   corporateYieldCurve: generateCorporateYieldCurve(),
-  portfolio: mockPortfolio,
+  get portfolio() { return getMockPortfolio(); },
   scenarios: mockScenarioAnalysis,
   generatePriceHistory,
   generateMarketDepth,
