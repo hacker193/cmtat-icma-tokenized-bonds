@@ -58,9 +58,17 @@ const BondPriceChart: React.FC<BondPriceChartProps> = ({
       return [];
     }
 
-    return validatedData
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-      .map((point, index) => {
+    try {
+      const safeValidatedData = Array.isArray(validatedData) ? validatedData : [];
+      return safeValidatedData
+        .sort((a, b) => {
+          try {
+            return new Date(a?.timestamp || 0).getTime() - new Date(b?.timestamp || 0).getTime();
+          } catch {
+            return 0;
+          }
+        })
+        .map((point, index) => {
         const currentPrice = safePrice(point.price, 100);
         const previousPrice = index > 0 ? safePrice(validatedData[index - 1].price, 100) : currentPrice;
         const volume = safeVolume(point.volume, 0);
@@ -91,6 +99,10 @@ const BondPriceChart: React.FC<BondPriceChartProps> = ({
           priceChangePercent: index > 0 ? safePercentageChange(currentPrice, previousPrice, 0) : 0,
         };
       });
+    } catch (error) {
+      console.warn('BondPriceChart: Error processing data:', error);
+      return [];
+    }
   }, [data]);
 
   // Calculate performance metrics with validation
@@ -102,11 +114,14 @@ const BondPriceChart: React.FC<BondPriceChartProps> = ({
     const priceChange = safeNumber(lastPrice - firstPrice, 0);
     const priceChangePercent = safePercentageChange(lastPrice, firstPrice, 0);
 
-    const validPrices = chartData.map(d => safePrice(d.price, null)).filter(p => p !== null) as number[];
+    const validPrices = (Array.isArray(chartData) ? chartData : [])
+      .map(d => safePrice(d?.price, null))
+      .filter(p => p !== null && isFinite(p)) as number[];
     const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : firstPrice;
     const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : firstPrice;
 
-    const totalVolume = chartData.reduce((sum, d) => sum + safeVolume(d.volume, 0), 0);
+    const totalVolume = (Array.isArray(chartData) ? chartData : [])
+      .reduce((sum, d) => sum + safeVolume(d?.volume, 0), 0);
     const avgVolume = chartData.length > 0 ? safeNumber(totalVolume / chartData.length, 0) : 0;
 
     return {

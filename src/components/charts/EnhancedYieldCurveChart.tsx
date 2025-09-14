@@ -93,7 +93,7 @@ const YieldCurveChartCore: React.FC<EnhancedYieldCurveChartProps> = ({
       }
 
       // Transform data for Recharts with safe operations
-      const processedData = validatedData.map(point => ({
+      const processedData = (Array.isArray(validatedData) ? validatedData : []).map(point => ({
         maturity: point.maturity,
         maturityLabel: point.maturity < 1
           ? `${Math.round(point.maturity * 12)}M`
@@ -108,7 +108,7 @@ const YieldCurveChartCore: React.FC<EnhancedYieldCurveChartProps> = ({
       let finalChartData = processedData;
 
       if (validatedCompareData.length > 0) {
-        const compareProcessed = validatedCompareData.map(point => ({
+        const compareProcessed = (Array.isArray(validatedCompareData) ? validatedCompareData : []).map(point => ({
           maturity: point.maturity,
           maturityLabel: point.maturity < 1
             ? `${Math.round(point.maturity * 12)}M`
@@ -118,7 +118,7 @@ const YieldCurveChartCore: React.FC<EnhancedYieldCurveChartProps> = ({
         }));
 
         // Merge by maturity with safe lookup
-        finalChartData = processedData.map(item => {
+        finalChartData = (Array.isArray(processedData) ? processedData : []).map(item => {
           const compareItem = compareProcessed.find(c =>
             Math.abs(c.maturity - item.maturity) < 0.01 // Allow small floating point differences
           );
@@ -134,12 +134,12 @@ const YieldCurveChartCore: React.FC<EnhancedYieldCurveChartProps> = ({
         processedData: {
           dataPoints: finalChartData.length,
           maturityRange: {
-            min: Math.min(...finalChartData.map(d => d.maturity)),
-            max: Math.max(...finalChartData.map(d => d.maturity))
+            min: finalChartData.length > 0 ? Math.min(...finalChartData.map(d => d?.maturity || 0)) : 0,
+            max: finalChartData.length > 0 ? Math.max(...finalChartData.map(d => d?.maturity || 0)) : 0
           },
           yieldRange: {
-            min: Math.min(...finalChartData.map(d => d.yield)),
-            max: Math.max(...finalChartData.map(d => d.yield))
+            min: finalChartData.length > 0 ? Math.min(...finalChartData.map(d => d?.yield || 0)) : 0,
+            max: finalChartData.length > 0 ? Math.max(...finalChartData.map(d => d?.yield || 0)) : 0
           }
         }
       };

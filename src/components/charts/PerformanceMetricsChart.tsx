@@ -241,8 +241,8 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
       return maxDrawdown;
     };
 
-    const returns = performanceData.slice(1).map(d => d.dailyReturn);
-    const benchmarkReturns = performanceData.slice(1).map(d => d.benchmarkReturn);
+    const returns = (Array.isArray(performanceData) && performanceData.length > 1 ? performanceData.slice(1) : []).map(d => d?.dailyReturn || 0).filter(r => isFinite(r));
+    const benchmarkReturns = (Array.isArray(performanceData) && performanceData.length > 1 ? performanceData.slice(1) : []).map(d => d?.benchmarkReturn || 0).filter(r => isFinite(r));
 
     const totalReturn = performanceData[performanceData.length - 1].cumulativeReturn;
     const benchmarkTotalReturn = performanceData[performanceData.length - 1].benchmarkReturn;
@@ -252,7 +252,7 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
     const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length * 252;
     const sharpeRatio = avgReturn / (volatility + 0.01);
 
-    const maxDrawdown = calculateMaxDrawdown(performanceData.map(d => d.cumulativeReturn));
+    const maxDrawdown = calculateMaxDrawdown((Array.isArray(performanceData) ? performanceData : []).map(d => d?.cumulativeReturn || 0).filter(r => isFinite(r)));
     const winRate = returns.filter(r => r > 0).length / returns.length * 100;
 
     return {
@@ -616,7 +616,7 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
                 fill="#8884d8"
                 dataKey="percentage"
               >
-                {attributionData.map((entry, index) => (
+                {(Array.isArray(attributionData) ? attributionData : []).map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -626,7 +626,7 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
         </div>
         <div style={{ width: '50%', padding: '0 1rem' }}>
           <Text fw={600} size="lg" mb="md">Performance Attribution</Text>
-          {attributionData.map((item, index) => (
+          {(Array.isArray(attributionData) ? attributionData : []).map((item, index) => (
             <Group key={index} justify="space-between" mb="sm">
               <Group>
                 <div

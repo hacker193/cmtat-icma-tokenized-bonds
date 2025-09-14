@@ -196,14 +196,16 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
       return safeNumber(maxDrawdown, 0, { min: 0, max: 100 });
     };
 
-    const returns = performanceData
-      .slice(1)
-      .map(d => safeNumber(d.dailyReturn, 0))
+    const returns = (Array.isArray(performanceData) && performanceData.length > 1
+      ? performanceData.slice(1)
+      : [])
+      .map(d => safeNumber(d?.dailyReturn, 0))
       .filter(r => isFinite(r));
 
-    const benchmarkReturns = performanceData
-      .slice(1)
-      .map(d => safeNumber(d.benchmarkReturn, 0))
+    const benchmarkReturns = (Array.isArray(performanceData) && performanceData.length > 1
+      ? performanceData.slice(1)
+      : [])
+      .map(d => safeNumber(d?.benchmarkReturn, 0))
       .filter(r => isFinite(r));
 
     if (returns.length === 0) {
@@ -238,7 +240,9 @@ const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = ({
     );
 
     const maxDrawdown = calculateMaxDrawdown(
-      performanceData.map(d => safeNumber(d.cumulativeReturn, 0))
+      (Array.isArray(performanceData) ? performanceData : [])
+        .map(d => safeNumber(d?.cumulativeReturn, 0))
+        .filter(r => isFinite(r))
     );
     const winRate = safeCalculation(
       () => (returns.filter(r => r > 0).length / returns.length) * 100,

@@ -52,7 +52,7 @@ const YieldCurveChart: React.FC<YieldCurveChartProps> = ({
       return [];
     }
 
-    const processedData = validatedData.map(point => {
+    const processedData = (Array.isArray(validatedData) ? validatedData : []).map(point => {
       const maturity = safeNumber(point.maturity, 0, { min: 0, max: 50 });
       const yieldValue = safeYield(point.yield, 0);
 
@@ -66,7 +66,7 @@ const YieldCurveChart: React.FC<YieldCurveChartProps> = ({
 
     // If comparison data is provided, merge it
     if (validatedCompareData && validatedCompareData.length > 0) {
-      const compareProcessed = validatedCompareData.map(point => {
+      const compareProcessed = (Array.isArray(validatedCompareData) ? validatedCompareData : []).map(point => {
         const maturity = safeNumber(point.maturity, 0, { min: 0, max: 50 });
         const yieldValue = safeYield(point.yield, 0);
 
@@ -79,7 +79,7 @@ const YieldCurveChart: React.FC<YieldCurveChartProps> = ({
       }).filter(point => point.maturity > 0);
 
       // Merge by maturity
-      return processedData.map(item => {
+      return (Array.isArray(processedData) ? processedData : []).map(item => {
         const compareItem = compareProcessed.find(c => Math.abs(c.maturity - item.maturity) < 0.1);
         return {
           ...item,
@@ -106,7 +106,7 @@ const YieldCurveChart: React.FC<YieldCurveChartProps> = ({
           <Text fw={600} size="sm" mb={4}>
             Maturity: {label}
           </Text>
-          {payload.map((entry: any, index: number) => (
+          {(Array.isArray(payload) ? payload : []).map((entry: any, index: number) => (
             <Group key={index} justify="space-between" gap="xs">
               <Text size="sm" c={entry.color}>
                 {entry.dataKey === 'yield' ? 'Treasury Yield' :
