@@ -94,23 +94,23 @@ export function CMTATComplianceDashboard() {
 
   // Convert CMTAT token holders to AccountInfo format
   const [accounts, setAccounts] = useState<AccountInfo[]>(
-    tokenHolders.map(holder => ({
-      address: holder.address,
-      balance: holder.balance,
-      frozen: holder.complianceFlags.includes('frozen'),
-      lastActivity: new Date(holder.lastTransactionDate),
-      riskScore: holder.riskScore <= 3 ? 'low' : holder.riskScore <= 6 ? 'medium' : 'high',
-    }))
+    Array.isArray(tokenHolders) ? tokenHolders.map(holder => ({
+      address: holder?.address || '',
+      balance: holder?.balance || 0,
+      frozen: Array.isArray(holder?.complianceFlags) ? holder.complianceFlags.includes('frozen') : false,
+      lastActivity: new Date(holder?.lastTransactionDate || Date.now()),
+      riskScore: (holder?.riskScore || 0) <= 3 ? 'low' : (holder?.riskScore || 0) <= 6 ? 'medium' : 'high',
+    })) : []
   );
 
   // Convert CMTAT compliance rules to TransferRule format
   const [transferRules, setTransferRules] = useState<TransferRule[]>(
-    complianceRules.map(rule => ({
-      id: rule.id,
-      name: rule.name,
-      active: rule.isActive,
-      description: rule.description,
-    }))
+    Array.isArray(complianceRules) ? complianceRules.map(rule => ({
+      id: rule?.id || '',
+      name: rule?.name || '',
+      active: rule?.isActive || false,
+      description: rule?.description || '',
+    })) : []
   );
 
   const [showFreezeModal, setShowFreezeModal] = useState(false);
@@ -181,9 +181,9 @@ export function CMTATComplianceDashboard() {
     setActionInProgress('freeze');
     setTimeout(() => {
       setAccounts(prev =>
-        prev.map(acc =>
-          acc.address === freezeAddress ? { ...acc, frozen: true } : acc
-        )
+        Array.isArray(prev) ? prev.map(acc =>
+          acc && acc.address === freezeAddress ? { ...acc, frozen: true } : acc
+        ) : []
       );
       setComplianceStatus(prev => ({
         ...prev,
@@ -203,9 +203,9 @@ export function CMTATComplianceDashboard() {
 
   const toggleTransferRule = (ruleId: string) => {
     setTransferRules(prev =>
-      prev.map(rule =>
-        rule.id === ruleId ? { ...rule, active: !rule.active } : rule
-      )
+      Array.isArray(prev) ? prev.map(rule =>
+        rule && rule.id === ruleId ? { ...rule, active: !rule.active } : rule
+      ) : []
     );
   };
 
@@ -340,7 +340,7 @@ export function CMTATComplianceDashboard() {
           <Card withBorder p="lg" h="100%">
             <Title order={5} mb="md">Transfer Rules</Title>
             <Stack gap="sm">
-              {transferRules.map((rule) => (
+              {Array.isArray(transferRules) ? transferRules.map((rule) => (
                 <Group key={rule.id} justify="space-between">
                   <div>
                     <Text size="sm" fw={500}>{rule.name}</Text>
@@ -353,7 +353,7 @@ export function CMTATComplianceDashboard() {
                     size="sm"
                   />
                 </Group>
-              ))}
+              )) : []}
             </Stack>
           </Card>
         </Grid.Col>
@@ -415,7 +415,7 @@ export function CMTATComplianceDashboard() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {accounts.map((account, index) => (
+            {Array.isArray(accounts) ? accounts.map((account, index) => (
               <Table.Tr key={index}>
                 <Table.Td>
                   <Code>{account.address}</Code>
@@ -444,7 +444,7 @@ export function CMTATComplianceDashboard() {
                   </ActionIcon>
                 </Table.Td>
               </Table.Tr>
-            ))}
+            )) : []}
           </Table.Tbody>
         </Table>
       </Card>
@@ -455,7 +455,7 @@ export function CMTATComplianceDashboard() {
           <Card withBorder p="lg">
             <Title order={5} mb="md">Recent Transfer Events</Title>
             <Stack gap="sm">
-              {transferEvents.slice(0, 5).map((event) => (
+              {Array.isArray(transferEvents) ? transferEvents.slice(0, 5).map((event) => (
                 <Group key={event.id} justify="space-between">
                   <div>
                     <Text size="sm" fw={500}>
@@ -472,7 +472,7 @@ export function CMTATComplianceDashboard() {
                     <Text size="xs" c="dimmed">{event.timestamp}</Text>
                   </div>
                 </Group>
-              ))}
+              )) : []}
             </Stack>
           </Card>
         </Grid.Col>
@@ -481,7 +481,7 @@ export function CMTATComplianceDashboard() {
           <Card withBorder p="lg">
             <Title order={5} mb="md">Recent Compliance Actions</Title>
             <Stack gap="sm">
-              {pauseEvents.map((event) => (
+              {Array.isArray(pauseEvents) ? pauseEvents.map((event) => (
                 <Group key={event.id} justify="space-between">
                   <div>
                     <Text size="sm" fw={500}>
@@ -500,7 +500,7 @@ export function CMTATComplianceDashboard() {
                     <Text size="xs" c="dimmed">{new Date(event.timestamp).toLocaleDateString()}</Text>
                   </div>
                 </Group>
-              ))}
+              )) : []}
             </Stack>
           </Card>
         </Grid.Col>

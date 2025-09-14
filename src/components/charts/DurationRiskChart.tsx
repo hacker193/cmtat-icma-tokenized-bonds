@@ -57,7 +57,7 @@ const DurationRiskChart: React.FC<DurationRiskChartProps> = ({
     if (!portfolio?.positions || !Array.isArray(portfolio.positions)) {
       return [];
     }
-    const data: DurationData[] = portfolio.positions.map(position => {
+    const data: DurationData[] = Array.isArray(portfolio?.positions) ? portfolio.positions.map(position => {
       const duration = position.bond.duration;
       const riskLevel =
         duration <= 2 ? 'very-low' :
@@ -75,7 +75,7 @@ const DurationRiskChart: React.FC<DurationRiskChartProps> = ({
         riskLevel,
         color: getRiskColor((duration / 15) * 100), // Normalize to 0-100 scale
       };
-    });
+    }) : [];
 
     return data.sort((a, b) => b.duration - a.duration);
   }, [portfolio]);
@@ -84,7 +84,7 @@ const DurationRiskChart: React.FC<DurationRiskChartProps> = ({
   const riskMetrics = useMemo(() => {
     const totalDuration = portfolio.averageDuration;
     const durationRisk = Math.abs(totalDuration - targetDuration);
-    const concentrationRisk = Math.max(...durationData.map(d => d.contribution)) - 25; // Risk if >25%
+    const concentrationRisk = Math.max(...(Array.isArray(durationData) ? durationData.map(d => d?.contribution || 0) : [0])) - 25; // Risk if >25%
 
     // Calculate duration buckets
     const buckets = {
@@ -286,8 +286,8 @@ const DurationRiskChart: React.FC<DurationRiskChartProps> = ({
         </div>
         <div style={{ textAlign: 'center' }}>
           <Text size="xs" c="dimmed">Max Concentration</Text>
-          <Text fw={600} size="sm" c={Math.max(...durationData.map(d => d.contribution)) > 25 ? 'orange' : 'green'}>
-            {Math.max(...durationData.map(d => d.contribution)).toFixed(1)}%
+          <Text fw={600} size="sm" c={Math.max(...(Array.isArray(durationData) ? durationData.map(d => d?.contribution || 0) : [0])) > 25 ? 'orange' : 'green'}>
+            {Math.max(...(Array.isArray(durationData) ? durationData.map(d => d?.contribution || 0) : [0])).toFixed(1)}%
           </Text>
         </div>
         <div style={{ textAlign: 'center' }}>

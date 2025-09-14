@@ -272,9 +272,9 @@ const OrderBookVisualization: React.FC<OrderBookVisualizationProps> = ({
               name="Quantity"
               radius={[0, 2, 2, 0]}
             >
-              {orderBookData.map((entry, index) => (
+              {Array.isArray(orderBookData) ? orderBookData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} opacity={0.8} />
-              ))}
+              )) : []}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -289,7 +289,7 @@ const OrderBookVisualization: React.FC<OrderBookVisualizationProps> = ({
           </Text>
           <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
             <Stack gap="xs">
-              {marketDepth.bids.slice(0, 5).map((bid, index) => (
+              {Array.isArray(marketDepth?.bids) ? marketDepth.bids.slice(0, 5).map((bid, index) => (
                 <div
                   key={index}
                   style={{
@@ -311,7 +311,7 @@ const OrderBookVisualization: React.FC<OrderBookVisualizationProps> = ({
                     {bid.orders}
                   </Text>
                 </div>
-              ))}
+              )) : []}
             </Stack>
           </div>
         </div>
@@ -356,7 +356,7 @@ const OrderBookVisualization: React.FC<OrderBookVisualizationProps> = ({
           </Text>
           <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
             <Stack gap="xs">
-              {marketDepth.asks.slice(0, 5).map((ask, index) => (
+              {Array.isArray(marketDepth?.asks) ? marketDepth.asks.slice(0, 5).map((ask, index) => (
                 <div
                   key={index}
                   style={{
@@ -378,7 +378,7 @@ const OrderBookVisualization: React.FC<OrderBookVisualizationProps> = ({
                     {ask.orders}
                   </Text>
                 </div>
-              ))}
+              )) : []}
             </Stack>
           </div>
         </div>

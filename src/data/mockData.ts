@@ -335,6 +335,11 @@ export const generateYieldCurveData = (): YieldCurvePoint[] => {
   const maturities = [0.25, 0.5, 1, 2, 3, 5, 7, 10, 20, 30];
   const today = new Date().toISOString().split('T')[0];
 
+  if (!Array.isArray(maturities)) {
+    console.error('maturities is not an array:', maturities);
+    return [];
+  }
+
   return maturities.map(maturity => ({
     maturity,
     yield: 3.5 + (maturity * 0.15) + (Math.random() - 0.5) * 0.3,
@@ -346,6 +351,11 @@ export const generateYieldCurveData = (): YieldCurvePoint[] => {
 // Generate corporate yield curve
 export const generateCorporateYieldCurve = (): YieldCurvePoint[] => {
   const treasuryCurve = generateYieldCurveData();
+  if (!Array.isArray(treasuryCurve)) {
+    console.error('treasuryCurve is not an array:', treasuryCurve);
+    return [];
+  }
+
   return treasuryCurve.map(point => ({
     ...point,
     yield: point.yield + 1.2 + (Math.random() - 0.5) * 0.2, // Credit spread
@@ -409,6 +419,11 @@ export const generateEnhancedPortfolio = (): Portfolio => {
 
   const bonds = mockBonds.slice(0, 6); // Use first 6 bonds for diversity
 
+  if (!Array.isArray(bonds)) {
+    console.error('bonds is not an array:', bonds);
+    return { positions: [], totalValue: 0, totalReturn: 0, averageDuration: 0, averageYield: 0 };
+  }
+
   const positions = bonds.map((bond, index) => {
     const quantity = 1000 + index * 750;
     const purchasePrice = bond.currentPrice - (0.5 + Math.random() * 1.5);
@@ -426,7 +441,7 @@ export const generateEnhancedPortfolio = (): Portfolio => {
     };
   });
 
-  const totalValue = positions.reduce((sum, pos) => sum + pos.currentMarketValue, 0);
+  const totalValue = Array.isArray(positions) ? positions.reduce((sum, pos) => sum + (pos?.currentMarketValue || 0), 0) : 0;
 
   // Calculate weights and yield contributions
   positions.forEach(position => {
@@ -434,10 +449,10 @@ export const generateEnhancedPortfolio = (): Portfolio => {
     position.yieldContribution = position.bond.yieldToMaturity * position.weightInPortfolio;
   });
 
-  const totalUnrealizedPnL = positions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0);
-  const totalReturn = (totalUnrealizedPnL / totalValue) * 100;
-  const averageDuration = positions.reduce((sum, pos) => sum + pos.duration * pos.weightInPortfolio, 0);
-  const averageYield = positions.reduce((sum, pos) => sum + pos.yieldContribution, 0);
+  const totalUnrealizedPnL = Array.isArray(positions) ? positions.reduce((sum, pos) => sum + (pos?.unrealizedPnL || 0), 0) : 0;
+  const totalReturn = totalValue > 0 ? (totalUnrealizedPnL / totalValue) * 100 : 0;
+  const averageDuration = Array.isArray(positions) ? positions.reduce((sum, pos) => sum + ((pos?.duration || 0) * (pos?.weightInPortfolio || 0)), 0) : 0;
+  const averageYield = Array.isArray(positions) ? positions.reduce((sum, pos) => sum + (pos?.yieldContribution || 0), 0) : 0;
 
   return {
     id: 'institutional-portfolio-1',
@@ -860,6 +875,11 @@ export const generateMarketImpactAnalysis = (bondId: string): {
   else impactCoeff = 1.5;
 
   const orderSizes = [100000, 500000, 1000000, 5000000, 10000000, 25000000];
+
+  if (!Array.isArray(orderSizes)) {
+    console.error('orderSizes is not an array:', orderSizes);
+    return [];
+  }
 
   const impactProjections = orderSizes.map(size => {
     const participationRate = size / averageDailyVolume;

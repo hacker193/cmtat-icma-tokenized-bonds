@@ -58,7 +58,16 @@ export interface EnhancedBond extends Bond {
 
 // Generate enhanced bonds with ICMA + CMTAT compliance
 export const generateEnhancedBonds = (): EnhancedBond[] => {
+  if (!Array.isArray(mockBonds)) {
+    console.error('mockBonds is not an array:', mockBonds);
+    return [];
+  }
+
   return mockBonds.map((bond, index) => {
+    if (!bond) {
+      console.error('Invalid bond at index:', index);
+      return null;
+    }
     // ICMA compliance data
     const icmaCompliance = {
       version: '1.2.0',
@@ -123,7 +132,7 @@ export const generateEnhancedBonds = (): EnhancedBond[] => {
       cmtatCompliance,
       marketStructure,
     };
-  });
+  }).filter(bond => bond !== null);
 };
 
 // Helper functions for generating compliance-specific data
@@ -341,10 +350,22 @@ export const demoDataProvider = {
   bondIssuances: sampleBondIssuances,
   // Utility functions
   getBondById: (bondId: string) => getEnhancedBonds().find(b => b.id === bondId),
-  getTokenizedBonds: () => getEnhancedBonds().filter(b => b.isTokenized),
-  getICMACompliantBonds: () => getEnhancedBonds().filter(b => b.icmaCompliance.taxonomyCompliant),
-  getCMTATEnabledBonds: () => getEnhancedBonds().filter(b => b.cmtatCompliance),
-  getESGBonds: () => getEnhancedBonds().filter(b => b.icmaCompliance.bondDataTaxonomy.esgClassification),
+  getTokenizedBonds: () => {
+    const bonds = getEnhancedBonds();
+    return Array.isArray(bonds) ? bonds.filter(b => b && b.isTokenized) : [];
+  },
+  getICMACompliantBonds: () => {
+    const bonds = getEnhancedBonds();
+    return Array.isArray(bonds) ? bonds.filter(b => b && b.icmaCompliance && b.icmaCompliance.taxonomyCompliant) : [];
+  },
+  getCMTATEnabledBonds: () => {
+    const bonds = getEnhancedBonds();
+    return Array.isArray(bonds) ? bonds.filter(b => b && b.cmtatCompliance) : [];
+  },
+  getESGBonds: () => {
+    const bonds = getEnhancedBonds();
+    return Array.isArray(bonds) ? bonds.filter(b => b && b.icmaCompliance && b.icmaCompliance.bondDataTaxonomy && b.icmaCompliance.bondDataTaxonomy.esgClassification) : [];
+  },
 };
 
 export default demoDataProvider;

@@ -173,21 +173,21 @@ export function BondLifecycleManager() {
       const upcomingCoupon = couponPayments.find(cp => cp.status === 'upcoming');
       if (upcomingCoupon) {
         setCouponPayments(prev =>
-          prev.map(cp =>
-            cp.id === upcomingCoupon.id
+          Array.isArray(prev) ? prev.map(cp =>
+            cp && cp.id === upcomingCoupon.id
               ? {
                   ...cp,
                   status: 'processing',
                 }
               : cp
-          )
+          ) : []
         );
 
         // Complete after another delay
         setTimeout(() => {
           setCouponPayments(prev =>
-            prev.map(cp =>
-              cp.id === upcomingCoupon.id
+            Array.isArray(prev) ? prev.map(cp =>
+              cp && cp.id === upcomingCoupon.id
                 ? {
                     ...cp,
                     status: 'completed',
@@ -195,7 +195,7 @@ export function BondLifecycleManager() {
                     transactionHash: `0x${Math.random().toString(16).substr(2, 8)}...${Math.random().toString(16).substr(2, 6)}`,
                   }
                 : cp
-            )
+            ) : []
           );
 
           // Add to lifecycle history
@@ -408,7 +408,7 @@ export function BondLifecycleManager() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {couponPayments.map((payment) => (
+            {Array.isArray(couponPayments) ? couponPayments.map((payment) => (
               <Table.Tr key={payment.id}>
                 <Table.Td>{payment.paymentDate.toLocaleDateString()}</Table.Td>
                 <Table.Td>{payment.rate}%</Table.Td>
@@ -436,7 +436,7 @@ export function BondLifecycleManager() {
                   </ActionIcon>
                 </Table.Td>
               </Table.Tr>
-            ))}
+            )) : []}
           </Table.Tbody>
         </Table>
       </Card>
@@ -445,7 +445,7 @@ export function BondLifecycleManager() {
       <Card withBorder p="lg">
         <Title order={4} mb="md">Lifecycle Events Timeline</Title>
         <Timeline active={lifecycleHistory.length}>
-          {lifecycleHistory.map((event, index) => (
+          {Array.isArray(lifecycleHistory) ? lifecycleHistory.map((event, index) => (
             <Timeline.Item
               key={event.id}
               bullet={
@@ -470,7 +470,7 @@ export function BondLifecycleManager() {
                 </Badge>
               </Group>
             </Timeline.Item>
-          ))}
+          )) : []}
         </Timeline>
       </Card>
 

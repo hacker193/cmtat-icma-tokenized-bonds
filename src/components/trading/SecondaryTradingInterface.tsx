@@ -88,19 +88,19 @@ export function SecondaryTradingInterface() {
         setOrderBookSnapshot(snapshot);
 
         // Convert order book data to display format
-        const bids = snapshot.bids.map(level => ({
-          price: level.price,
-          quantity: level.quantity,
-          total: level.price * level.quantity,
+        const bids = Array.isArray(snapshot.bids) ? snapshot.bids.map(level => ({
+          price: level?.price || 0,
+          quantity: level?.quantity || 0,
+          total: (level?.price || 0) * (level?.quantity || 0),
           side: 'bid' as const,
-        }));
+        })) : [];
 
-        const asks = snapshot.asks.map(level => ({
-          price: level.price,
-          quantity: level.quantity,
-          total: level.price * level.quantity,
+        const asks = Array.isArray(snapshot.asks) ? snapshot.asks.map(level => ({
+          price: level?.price || 0,
+          quantity: level?.quantity || 0,
+          total: (level?.price || 0) * (level?.quantity || 0),
           side: 'ask' as const,
-        }));
+        })) : [];
 
         setOrderBook({ bids, asks });
         setCurrentPrice(snapshot.midPrice);
@@ -215,11 +215,11 @@ export function SecondaryTradingInterface() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       setRecentTrades(prev =>
-        prev.map(t =>
-          t.id === newTrade.id
+        Array.isArray(prev) ? prev.map(t =>
+          t && t.id === newTrade.id
             ? { ...t, validationSteps: { ...t.validationSteps, [step]: true } }
             : t
-        )
+        ) : []
       );
     }
 
@@ -231,11 +231,11 @@ export function SecondaryTradingInterface() {
     const reason = isValid ? undefined : 'CMTAT validation failed: Insufficient allowance';
 
     setRecentTrades(prev =>
-      prev.map(t =>
-        t.id === newTrade.id
+      Array.isArray(prev) ? prev.map(t =>
+        t && t.id === newTrade.id
           ? { ...t, status: finalStatus, reason }
           : t
-      )
+      ) : []
     );
 
     notifications.show({
@@ -351,13 +351,13 @@ export function SecondaryTradingInterface() {
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
-                    {orderBook.bids.slice(0, 5).map((bid, index) => (
+                    {Array.isArray(orderBook.bids) ? orderBook.bids.slice(0, 5).map((bid, index) => (
                       <Table.Tr key={index}>
                         <Table.Td c="green">{selectedBond.currency === 'USD' ? '$' : '€'}{bid.price.toFixed(3)}</Table.Td>
                         <Table.Td>{selectedBond.currency === 'USD' ? '$' : '€'}{(bid.quantity / 1000000).toFixed(1)}M</Table.Td>
                         <Table.Td>{selectedBond.currency === 'USD' ? '$' : '€'}{(bid.total / 1000000).toFixed(1)}M</Table.Td>
                       </Table.Tr>
-                    ))}
+                    )) : []}
                   </Table.Tbody>
                 </Table>
               </Grid.Col>
@@ -372,13 +372,13 @@ export function SecondaryTradingInterface() {
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
-                    {orderBook.asks.slice(0, 5).map((ask, index) => (
+                    {Array.isArray(orderBook.asks) ? orderBook.asks.slice(0, 5).map((ask, index) => (
                       <Table.Tr key={index}>
                         <Table.Td c="red">{selectedBond.currency === 'USD' ? '$' : '€'}{ask.price.toFixed(3)}</Table.Td>
                         <Table.Td>{selectedBond.currency === 'USD' ? '$' : '€'}{(ask.quantity / 1000000).toFixed(1)}M</Table.Td>
                         <Table.Td>{selectedBond.currency === 'USD' ? '$' : '€'}{(ask.total / 1000000).toFixed(1)}M</Table.Td>
                       </Table.Tr>
-                    ))}
+                    )) : []}
                   </Table.Tbody>
                 </Table>
               </Grid.Col>
@@ -505,7 +505,7 @@ export function SecondaryTradingInterface() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {recentTrades.map((trade) => (
+            {Array.isArray(recentTrades) ? recentTrades.map((trade) => (
               <Table.Tr key={trade.id}>
                 <Table.Td>
                   <Text size="sm">{trade.timestamp.toLocaleTimeString()}</Text>
@@ -551,7 +551,7 @@ export function SecondaryTradingInterface() {
                   </ActionIcon>
                 </Table.Td>
               </Table.Tr>
-            ))}
+            )) : []}
           </Table.Tbody>
         </Table>
       </Card>

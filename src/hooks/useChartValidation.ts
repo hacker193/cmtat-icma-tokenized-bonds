@@ -49,7 +49,7 @@ export const useYieldCurveValidation = (data: YieldCurvePoint[]) => {
 
     if (sanitizedData.length > 0) {
       // Check maturity range (should span from short to long term)
-      const maturities = sanitizedData.map(p => p.maturity).sort((a, b) => a - b);
+      const maturities = Array.isArray(sanitizedData) ? sanitizedData.map(p => p?.maturity || 0).sort((a, b) => a - b) : [];
       results.hasProperMaturityRange = maturities[0] <= 1 && maturities[maturities.length - 1] >= 10;
 
       // Check for monotonic increasing (normal yield curve shape)
@@ -119,7 +119,7 @@ export const useBondPriceValidation = (data: PriceHistory[]) => {
 
     if (sanitizedData.length > 1) {
       // Check for reasonable price range (bond prices typically 70-130)
-      const prices = sanitizedData.map(p => p.price);
+      const prices = Array.isArray(sanitizedData) ? sanitizedData.map(p => p?.price || 0) : [];
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       results.hasReasonablePriceRange = minPrice >= 50 && maxPrice <= 150;

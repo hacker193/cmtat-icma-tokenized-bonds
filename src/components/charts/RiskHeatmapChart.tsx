@@ -33,7 +33,7 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
     if (!portfolio?.positions || !Array.isArray(portfolio.positions)) {
       return { sectors: [], ratings: [], data: [] };
     }
-    const sectors = [...new Set(portfolio.positions.map(p => p.bond.sector))];
+    const sectors = [...new Set(Array.isArray(portfolio?.positions) ? portfolio.positions.map(p => p?.bond?.sector).filter(Boolean) : [])];
     const ratings = ['AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-'];
 
     const data: HeatmapCell[][] = [];
@@ -44,9 +44,9 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
         const sector = sectors[x];
         const rating = ratings[y];
 
-        const bondsInCell = portfolio.positions.filter(p =>
-          p.bond.sector === sector && p.bond.rating === rating
-        );
+        const bondsInCell = Array.isArray(portfolio?.positions) ? portfolio.positions.filter(p =>
+          p?.bond?.sector === sector && p?.bond?.rating === rating
+        ) : [];
 
         const totalValue = bondsInCell.reduce((sum, p) => sum + p.currentMarketValue, 0);
         const percentage = (totalValue / portfolio.totalValue) * 100;
@@ -61,7 +61,7 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
           y,
           value: percentage,
           label: `${percentage.toFixed(1)}%`,
-          bondName: bondsInCell.map(p => p.bond.name).join(', ') || 'None',
+          bondName: Array.isArray(bondsInCell) ? bondsInCell.map(p => p?.bond?.name).filter(Boolean).join(', ') || 'None' : 'None',
           risk: riskScore < 20 ? 'Low' : riskScore < 50 ? 'Medium' : 'High',
           color: getRiskColor(riskScore),
         });
@@ -233,10 +233,10 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
               <strong>{portfolio.positions.length}</strong> positions
             </Text>
             <Text size="xs">
-              <strong>{[...new Set(portfolio.positions.map(p => p.bond.sector))].length}</strong> sectors
+              <strong>{[...new Set(Array.isArray(portfolio?.positions) ? portfolio.positions.map(p => p?.bond?.sector).filter(Boolean) : [])].length}</strong> sectors
             </Text>
             <Text size="xs">
-              <strong>{[...new Set(portfolio.positions.map(p => p.bond.rating))].length}</strong> ratings
+              <strong>{[...new Set(Array.isArray(portfolio?.positions) ? portfolio.positions.map(p => p?.bond?.rating).filter(Boolean) : [])].length}</strong> ratings
             </Text>
           </Group>
         </div>
@@ -244,7 +244,7 @@ const RiskHeatmapChart: React.FC<RiskHeatmapChartProps> = ({
         <div style={{ textAlign: 'right' }}>
           <Text size="xs" c="dimmed">Concentration</Text>
           <Text size="xs" fw={500}>
-            Max: {Math.max(...portfolio.positions.map(p => p.weightInPortfolio)).toFixed(1)}%
+            Max: {Math.max(...(Array.isArray(portfolio?.positions) ? portfolio.positions.map(p => p?.weightInPortfolio || 0) : [0])).toFixed(1)}%
           </Text>
         </div>
       </Group>

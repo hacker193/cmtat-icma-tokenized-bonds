@@ -78,8 +78,8 @@ class OrderBookGenerator {
     const spread = asks[0].price - bids[0].price;
     const spreadBps = (spread / midPrice) * 10000;
 
-    const totalBidVolume = bids.reduce((sum, level) => sum + level.quantity, 0);
-    const totalAskVolume = asks.reduce((sum, level) => sum + level.quantity, 0);
+    const totalBidVolume = Array.isArray(bids) ? bids.reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
+    const totalAskVolume = Array.isArray(asks) ? asks.reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
 
     // Market capacity estimation (volume available within 100bps)
     const marketCapacity = this.calculateMarketCapacity(bids, asks, midPrice);
@@ -194,13 +194,13 @@ class OrderBookGenerator {
   private calculateMarketCapacity(bids: OrderBookLevel[], asks: OrderBookLevel[], midPrice: number): number {
     const bps100Price = midPrice * 0.01; // 100 basis points
 
-    const bidCapacity = bids
-      .filter(level => midPrice - level.price <= bps100Price)
-      .reduce((sum, level) => sum + level.quantity, 0);
+    const bidCapacity = Array.isArray(bids) ? bids
+      .filter(level => level && typeof level.price === 'number' && midPrice - level.price <= bps100Price)
+      .reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
 
-    const askCapacity = asks
-      .filter(level => level.price - midPrice <= bps100Price)
-      .reduce((sum, level) => sum + level.quantity, 0);
+    const askCapacity = Array.isArray(asks) ? asks
+      .filter(level => level && typeof level.price === 'number' && level.price - midPrice <= bps100Price)
+      .reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
 
     return bidCapacity + askCapacity;
   }
@@ -292,13 +292,13 @@ class OrderBookGenerator {
   private calculateDepthAtBps(bids: OrderBookLevel[], asks: OrderBookLevel[], midPrice: number, bps: number): number {
     const threshold = midPrice * (bps / 10000);
 
-    const bidDepth = bids
-      .filter(level => midPrice - level.price <= threshold)
-      .reduce((sum, level) => sum + level.quantity, 0);
+    const bidDepth = Array.isArray(bids) ? bids
+      .filter(level => level && typeof level.price === 'number' && midPrice - level.price <= threshold)
+      .reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
 
-    const askDepth = asks
-      .filter(level => level.price - midPrice <= threshold)
-      .reduce((sum, level) => sum + level.quantity, 0);
+    const askDepth = Array.isArray(asks) ? asks
+      .filter(level => level && typeof level.price === 'number' && level.price - midPrice <= threshold)
+      .reduce((sum, level) => sum + (level?.quantity || 0), 0) : 0;
 
     return bidDepth + askDepth;
   }
@@ -346,7 +346,9 @@ export const generateOrderBookData = {
       historical: OrderBookSnapshot[];
     }> = {};
 
-    tokenizedBonds.forEach(bond => {
+    (Array.isArray(tokenizedBonds) ? tokenizedBonds : []).forEach(bond => {
+      if (!bond || !bond.id) return;
+
       const snapshot = orderBookGenerator.generateSnapshot(bond.id, 20);
       const metrics = orderBookGenerator.calculateOrderBookMetrics(snapshot);
       const updates = orderBookGenerator.generateOrderBookUpdates(bond.id, 15);
