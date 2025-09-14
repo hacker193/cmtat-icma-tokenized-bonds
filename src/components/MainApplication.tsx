@@ -61,8 +61,13 @@ import {
 export default function MainApplication() {
   const [activeTab, setActiveTab] = useState('issuance');
   const [selectedBond, setSelectedBond] = useState(() => {
-    const bonds = demoDataProvider.enhancedBonds;
-    return (bonds && bonds.length > 0) ? bonds[0] : null;
+    try {
+      const bonds = demoDataProvider.enhancedBonds;
+      return (bonds && Array.isArray(bonds) && bonds.length > 0) ? bonds[0] : null;
+    } catch (error) {
+      console.warn('Error initializing selected bond:', error);
+      return null;
+    }
   });
   const [timeframe, setTimeframe] = useState('3M');
 
@@ -181,15 +186,22 @@ export default function MainApplication() {
                     if (bond) setSelectedBond(bond);
                   }}
                   data={(() => {
-                    const bonds = demoDataProvider.enhancedBonds;
-                    if (!bonds || !Array.isArray(bonds) || bonds.length === 0) {
-                      return [{ value: '', label: 'No bonds available', group: 'Loading...' }];
+                    try {
+                      const bonds = demoDataProvider.enhancedBonds;
+                      // More robust null/undefined checking for SSR
+                      if (!bonds || !Array.isArray(bonds) || bonds.length === 0) {
+                        return [{ value: '', label: 'No bonds available', group: 'Loading...' }];
+                      }
+                      // Additional safety check before map
+                      return Array.isArray(bonds) ? bonds.map(bond => ({
+                        value: bond?.id || '',
+                        label: `${bond?.name || 'Unknown Bond'} (${bond?.rating || 'NR'}) ${bond?.isTokenized ? '🔗' : '📄'}`,
+                        group: bond?.isTokenized ? 'Tokenized Bonds' : 'Traditional Bonds',
+                      })) : [{ value: '', label: 'No bonds available', group: 'Error' }];
+                    } catch (error) {
+                      console.warn('Error loading bonds for select dropdown:', error);
+                      return [{ value: '', label: 'Error loading bonds', group: 'Error' }];
                     }
-                    return bonds.map(bond => ({
-                      value: bond.id,
-                      label: `${bond.name} (${bond.rating}) ${bond.isTokenized ? '🔗' : '📄'}`,
-                      group: bond.isTokenized ? 'Tokenized Bonds' : 'Traditional Bonds',
-                    }));
                   })()}
                   w={350}
                   searchable

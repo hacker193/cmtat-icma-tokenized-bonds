@@ -322,9 +322,15 @@ function getEnhancedBonds(): EnhancedBond[] {
       console.warn('mockBonds not available during SSR, returning empty array');
       return [];
     }
-    cachedEnhancedBonds = generateEnhancedBonds();
+    try {
+      cachedEnhancedBonds = generateEnhancedBonds();
+    } catch (error) {
+      console.error('Error generating enhanced bonds:', error);
+      return [];
+    }
   }
-  return cachedEnhancedBonds;
+  // Ensure we always return an array, never null or undefined
+  return cachedEnhancedBonds || [];
 }
 
 // Export unified demo data provider
