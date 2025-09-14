@@ -3,9 +3,9 @@
 import dynamic from 'next/dynamic';
 import { Container, Text, Title, Loader, Center, Stack } from '@mantine/core';
 
-// Import the original MainApplication with SSR disabled
+// Import the minimal test version first to isolate chart errors
 const MainApplication = dynamic(
-  () => import('./MainApplication'),
+  () => import('./MinimalTest'),
   {
     ssr: false,
     loading: () => (
