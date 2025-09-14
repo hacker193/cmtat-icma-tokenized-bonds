@@ -1,4 +1,4 @@
-import MainApplication from '@/components/MainApplicationUltraMinimal';
+import MainApplication from '@/components/MainApplicationPureReact';
 
 export default function Home() {
   return <MainApplication />;
