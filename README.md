@@ -2,6 +2,17 @@
 
 A comprehensive demonstration platform showcasing the integration of **CMTAT (Capital Markets and Technology Association) v3.0** framework with **ICMA Bond Data Taxonomy v1.2** for tokenized fixed income securities.
 
+## 🌐 Live Platform
+
+**🚀 [View Live Demo](https://siva-sub.github.io/cmtat-icma-tokenized-bonds/)**
+
+Experience the complete tokenized fixed income platform featuring:
+- 12 realistic bonds ($344M portfolio)
+- CMTAT v3.0 token controls (pause, freeze, snapshots)
+- ICMA BDT v1.2 taxonomy implementation
+- Professional trading interface with order books
+- Advanced risk analytics and compliance dashboard
+
 ## 🏦 About
 
 This project was developed by **Sivasubramanian Ramanathan**, former Product Owner at the **Bank for International Settlements (BIS)**. Having worked extensively in central banking and financial infrastructure, I became deeply curious about emerging standards in tokenized finance, particularly:
