@@ -3,9 +3,9 @@
 import dynamic from 'next/dynamic';
 import { Container, Text, Title, Loader, Center, Stack } from '@mantine/core';
 
-// Import the full MainApplication with all chart fixes applied
+// Import progressive test to isolate problematic components
 const MainApplication = dynamic(
-  () => import('./MainApplication'),
+  () => import('./ProgressiveTest'),
   {
     ssr: false,
     loading: () => (
