@@ -312,18 +312,33 @@ export const sampleBondIssuances = [
   },
 ];
 
+// Cache for generated bonds to avoid recomputation during SSR
+let cachedEnhancedBonds: EnhancedBond[] | null = null;
+
+function getEnhancedBonds(): EnhancedBond[] {
+  if (!cachedEnhancedBonds || cachedEnhancedBonds.length === 0) {
+    // Ensure mockBonds is available before calling map
+    if (!mockBonds || !Array.isArray(mockBonds)) {
+      console.warn('mockBonds not available during SSR, returning empty array');
+      return [];
+    }
+    cachedEnhancedBonds = generateEnhancedBonds();
+  }
+  return cachedEnhancedBonds;
+}
+
 // Export unified demo data provider
 export const demoDataProvider = {
-  enhancedBonds: generateEnhancedBonds(),
+  get enhancedBonds() { return getEnhancedBonds(); },
   cmtatData: cmtatDemoData,
   marketData: mockData,
   bondIssuances: sampleBondIssuances,
   // Utility functions
-  getBondById: (bondId: string) => generateEnhancedBonds().find(b => b.id === bondId),
-  getTokenizedBonds: () => generateEnhancedBonds().filter(b => b.isTokenized),
-  getICMACompliantBonds: () => generateEnhancedBonds().filter(b => b.icmaCompliance.taxonomyCompliant),
-  getCMTATEnabledBonds: () => generateEnhancedBonds().filter(b => b.cmtatCompliance),
-  getESGBonds: () => generateEnhancedBonds().filter(b => b.icmaCompliance.bondDataTaxonomy.esgClassification),
+  getBondById: (bondId: string) => getEnhancedBonds().find(b => b.id === bondId),
+  getTokenizedBonds: () => getEnhancedBonds().filter(b => b.isTokenized),
+  getICMACompliantBonds: () => getEnhancedBonds().filter(b => b.icmaCompliance.taxonomyCompliant),
+  getCMTATEnabledBonds: () => getEnhancedBonds().filter(b => b.cmtatCompliance),
+  getESGBonds: () => getEnhancedBonds().filter(b => b.icmaCompliance.bondDataTaxonomy.esgClassification),
 };
 
 export default demoDataProvider;

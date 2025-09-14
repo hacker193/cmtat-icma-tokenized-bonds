@@ -238,6 +238,10 @@ Former Product Owner, Bank for International Settlements (BIS)
 
 *Specialized in central banking innovation, financial infrastructure, and emerging tokenization standards. This project represents a deep exploration into how traditional fixed income markets can evolve through standards-based tokenization frameworks like CMTAT and ICMA BDT.*
 
+**Contact Information:**
+- Email: [hello@sivasub.com](mailto:hello@sivasub.com)
+- LinkedIn: [sivasub987](https://linkedin.com/in/sivasub987)
+
 ## 🎯 Project Vision
 
 This platform demonstrates the convergence of traditional institutional fixed income markets with modern tokenization standards, showcasing how CMTAT, ICMA BDT, and MAS Project Guardian frameworks can enable the next generation of capital markets infrastructure.
