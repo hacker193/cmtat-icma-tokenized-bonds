@@ -1,5 +1,5 @@
-import MainApplication from '@/components/MainApplicationPureReact';
+import MainApplicationDynamic from '@/components/MainApplicationDynamic';
 
 export default function Home() {
-  return <MainApplication />;
+  return <MainApplicationDynamic />;
 }
