@@ -1,6 +1,6 @@
 import { Container, Text, Title, Loader, Center, Stack } from '@mantine/core';
 import ClientOnly from '@/components/ClientOnly';
-import MainApplication from '@/components/MainApplication';
+import MainApplication from '@/components/MainApplicationMinimal';
 
 export default function Home() {
   return (
